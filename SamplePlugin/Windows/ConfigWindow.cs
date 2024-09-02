@@ -12,6 +12,7 @@ public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
     private byte[] textInput = new byte[128];
+    private byte[] userName = new byte[128];
 
     // We give this window a constant ID using ###
     // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
@@ -34,8 +35,25 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
+        // can't ref a property, so use a local copy
+        var configValue = Configuration.showDebug;
+        if (ImGui.Checkbox("Show Debug", ref configValue))
+        {
+            Configuration.showDebug = configValue;
+            Configuration.Save();
+        }
+        ImGui.Text("Enter Discord User Name Here");
+        ImGui.InputText(" ##username", userName, 128);
+        ImGui.SameLine();
+        if (ImGui.Button("Save"))
+        {
+            Configuration.discordUser = Encoding.UTF8.GetString(userName).Replace("\u0000", string.Empty);
+            userName = new byte[128];
+            Configuration.Save();
+        }
+
         ImGui.Text("Enter Discord Token Here");
-        ImGui.InputText(" ", textInput, 128);
+        ImGui.InputText(" ##token", textInput, 128);
         ImGui.SameLine();
         if (ImGui.Button("Save"))
         {

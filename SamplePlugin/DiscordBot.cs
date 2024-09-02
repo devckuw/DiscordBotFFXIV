@@ -83,7 +83,7 @@ namespace DiscordBotFFXIV
 
         private Task OnMessageReceived(SocketMessage message)
         {
-            if (message.Author.Username == "devckuw")
+            if (message.Author.Username == plugin.Configuration.discordUser)
             {
                 string msg = message.Content;
                 ChatMode mode = ProcessChatMode(message.Content);

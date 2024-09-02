@@ -42,7 +42,10 @@ public class MainWindow : Window, IDisposable
     {
         foreach (var item in Plugin.discordBot.messages)
         {
-            //ChatHelper.Send(ChatMode.Echo, "chatmode : " + item.Item1 + ", content : " + item.Item2);
+            if (Plugin.Configuration.showDebug)
+            {
+                ChatHelper.Send(ChatMode.Echo, "chatmode : " + item.Item1 + ", content : " + item.Item2);
+            }
             ChatHelper.Send(item.Item1, item.Item2);
         }
         Plugin.discordBot.messages.Clear();
@@ -57,6 +60,10 @@ public class MainWindow : Window, IDisposable
         if (Plugin.Configuration.DiscordToken  == string.Empty)
         {
             ImGui.Text("Enter your token in the config pannel then restart the plugin");
+        }
+        if (Plugin.Configuration.discordUser  == string.Empty)
+        {
+            ImGui.Text("Enter your discord name in pannel config or u wont get any msg");
         }
         ImGui.Text("try input, should work the same as discord");
         ImGui.Text("exemple : p|party msg");
