@@ -1,12 +1,12 @@
 {
-  "Author": "your name here",
-  "Name": "Sample Plugin",
-  "Punchline": "A short one-liner that shows up in /xlplugins.",
-  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
-  "ApplicableVersion": "any",
-  "Tags": [
-    "sample",
-    "plugin",
-    "goats"
-  ]
+    "Author": "Loody",
+    "Name": "DiscordBotFFXIV",
+    "Punchline": "Send message to friends from discord",
+    "Description": "Discord / FFXIV bot to send msg from discord to the game",
+    "ApplicableVersion": "any",
+    "Tags": [
+        "discord",
+        "message",
+        "friend"
+    ]
 }

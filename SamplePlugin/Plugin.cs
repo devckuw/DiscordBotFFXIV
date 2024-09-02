@@ -2,9 +2,12 @@ using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using System.Threading.Tasks;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using DiscordBotFFXIV.Windows;
+using Dalamud.Game;
+using DiscordBotFFXIV.Utils;
 
 namespace DiscordBotFFXIV;
 
@@ -13,6 +16,10 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IDalamudPluginInterface PluginInterface { get; private set; } = null!;
     [PluginService] internal static ITextureProvider TextureProvider { get; private set; } = null!;
     [PluginService] internal static ICommandManager CommandManager { get; private set; } = null!;
+    [PluginService] internal static IPluginLog Logger { get; private set; } = null!;
+    [PluginService] public static ISigScanner SigScanner { get; private set; } = null!;
+    [PluginService] public static IGameGui GameGui { get; private set; } = null!;
+    [PluginService] public static IFramework Framework { get; private set; } = null!;
 
     private const string CommandName = "/discordbot";
 
@@ -21,6 +28,7 @@ public sealed class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("DiscordBotFFXIV");
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
+    public DiscordBot discordBot { get; init; }
 
     public Plugin()
     {
@@ -30,6 +38,14 @@ public sealed class Plugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
+
+        ChatHelper.Initialize();
+
+        discordBot = new DiscordBot(this);
+        Task.Run(async () =>
+        {
+            await discordBot.Start();
+        });
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
@@ -52,6 +68,8 @@ public sealed class Plugin : IDalamudPlugin
     public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
+        discordBot.Dispose();
+        ChatHelper.Instance?.Dispose();
 
         ConfigWindow.Dispose();
         MainWindow.Dispose();
