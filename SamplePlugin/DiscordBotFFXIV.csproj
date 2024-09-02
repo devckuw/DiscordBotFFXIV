@@ -20,4 +20,8 @@
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.15.3" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Images\*" />
+  </ItemGroup>
 </Project>
