@@ -4,6 +4,8 @@
     "Punchline": "Send message to friends from discord",
     "Description": "Discord / FFXIV bot to send msg from discord to the game",
     "ApplicableVersion": "any",
+    "IconUrl": "https://raw.githubusercontent.com/devckuw/DiscordBotFFXIV/master/SamplePlugin/Images/Icon.png",
+    "RepoUrl": "https://github.com/devckuw/DiscordBotFFXIV",
     "Tags": [
         "discord",
         "message",
