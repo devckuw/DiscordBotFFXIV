@@ -45,7 +45,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Text("Enter Discord User Name Here");
         ImGui.InputText(" ##username", userName, 128);
         ImGui.SameLine();
-        if (ImGui.Button("Save"))
+        if (ImGui.Button("Save##saveusername"))
         {
             Configuration.discordUser = Encoding.UTF8.GetString(userName).Replace("\u0000", string.Empty);
             userName = new byte[128];
@@ -55,7 +55,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Text("Enter Discord Token Here");
         ImGui.InputText(" ##token", textInput, 128);
         ImGui.SameLine();
-        if (ImGui.Button("Save"))
+        if (ImGui.Button("Save##savetoken"))
         {
             Configuration.DiscordToken = Encoding.UTF8.GetString(textInput).Replace("\u0000", string.Empty);
             textInput = new byte[128];
