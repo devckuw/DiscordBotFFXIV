@@ -86,12 +86,7 @@ namespace DiscordBotFFXIV
             if (message.Author.Username == plugin.Configuration.discordUser)
             {
                 string msg = message.Content;
-                ChatMode mode = ProcessChatMode(message.Content);
-                if (mode != ChatMode.None)
-                {
-                    msg = ProcessContent(msg);
-                }
-                messages.Add((mode, msg));
+                AddMessageToQueue(msg);
             }
             return Task.CompletedTask;
         }
@@ -112,6 +107,16 @@ namespace DiscordBotFFXIV
         public static string ProcessContent(string msg)
         {
             return string.Join(" ", msg.Split(" ")[1..]);
+        }
+
+        public void AddMessageToQueue(string message)
+        {
+            ChatMode mode = DiscordBot.ProcessChatMode(message);
+            if (mode != ChatMode.None)
+            {
+                message = DiscordBot.ProcessContent(message);
+            }
+            messages.Add((mode, message));
         }
 
     }
