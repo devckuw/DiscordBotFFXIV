@@ -43,6 +43,7 @@ public class MainWindow : Window, IDisposable
 
     private void OnUpdate(IFramework framework)
     {
+        if (Plugin.discordBot == null) return;
         foreach (var item in Plugin.discordBot.messages)
         {
             if (Plugin.Configuration.showDebug)
