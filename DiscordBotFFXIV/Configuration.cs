@@ -17,6 +17,7 @@ public class Configuration : IPluginConfiguration
     // the below exist just to make saving less cumbersome
     public void Save()
     {
+        DiscordBot.userName = discordUser;
         Plugin.PluginInterface.SavePluginConfig(this);
     }
 }

@@ -10,6 +10,7 @@ using ImGuiNET;
 using DiscordBotFFXIV.Utils;
 using Dalamud.Interface.Components;
 using Dalamud.Utility;
+using Serilog.Core;
 
 namespace DiscordBotFFXIV.Windows;
 
@@ -44,7 +45,7 @@ public class MainWindow : Window, IDisposable
     private void OnUpdate(IFramework framework)
     {
         if (Plugin.discordBot == null) return;
-        foreach (var item in Plugin.discordBot.messages)
+        foreach (var item in DiscordBot.messages)
         {
             if (Plugin.Configuration.showDebug)
             {
@@ -52,7 +53,7 @@ public class MainWindow : Window, IDisposable
             }
             ChatHelper.Send(item.Item1, item.Item2);
         }
-        Plugin.discordBot.messages.Clear();
+        DiscordBot.messages.Clear();
     }
 
     public override void Draw()
@@ -116,7 +117,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Here you can change the name of your bot in username input.");
         ImGui.Text("Turn on 'Message Content Intent' or the bot wont be able to read your mesages.");
         ImGui.Text("Dont forget to save modification.");
-        ImGui.Text("Clic 'Reset Token' to get your bot token and enter it bellow.");
+        ImGui.Text("Click 'Reset Token' to get your bot token and enter it bellow.");
         ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 64);
         ImGui.SameLine();
         if (ImGui.Button("Save##savetoken"))

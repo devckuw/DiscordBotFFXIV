@@ -20,6 +20,7 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] public static ISigScanner SigScanner { get; private set; } = null!;
     [PluginService] public static IGameGui GameGui { get; private set; } = null!;
     [PluginService] public static IFramework Framework { get; private set; } = null!;
+    [PluginService] public static IDataManager DataManager { get; private set; } = null!;
 
     private const string CommandName = "/discordbot";
 
@@ -46,6 +47,7 @@ public sealed class Plugin : IDalamudPlugin
         {
             await discordBot.Start();
         });
+        DiscordBot.userName = Configuration.discordUser;
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
