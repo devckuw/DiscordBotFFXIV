@@ -84,13 +84,13 @@ public class MainWindow : Window, IDisposable
         ImGui.NewLine();
         if (ImGui.InputTextWithHint("##inputTest", "Try input here, should work the same as on discord.", ref testMessage, 256, ImGuiInputTextFlags.EnterReturnsTrue))
         {
-            Plugin.discordBot.AddMessageToQueue(testMessage);
+            DiscordBot.AddMessageToQueue(testMessage);
             testMessage = string.Empty;
         }
         ImGui.SameLine();
         if (ImGui.Button("Send##inputTestSend"))
         {
-            Plugin.discordBot.AddMessageToQueue(testMessage);
+            DiscordBot.AddMessageToQueue(testMessage);
             testMessage = string.Empty;
         }
         ImGui.Text("exemple : chat-mode msg");

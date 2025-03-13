@@ -153,14 +153,12 @@ public class DiscordBot : IDisposable
         //await Task.Delay(-1);
     }
 
-    private unsafe bool buildOption()
+    public static unsafe bool buildOption()
     {
 
         var agent = AgentFriendlist.Instance();
         if (agent == null) return false;
         if (agent->InfoProxy == null) return false;
-
-        AddMessageToQueue($"e {agent->InfoProxy->EntryCount}");
 
         for (var i = 0U; i < agent->InfoProxy->EntryCount; i++)
         {
@@ -170,7 +168,7 @@ public class DiscordBot : IDisposable
             var name = friend->NameString;
             ComModule.names.Add($"{name}@{world.Name}");
         }
-        AddMessageToQueue("e 3");
+
         return true;
     }
 
@@ -192,7 +190,7 @@ public class DiscordBot : IDisposable
         return string.Join(" ", msg.Split(" ")[1..]);
     }
 
-    public void AddMessageToQueue(string message)
+    public static void AddMessageToQueue(string message)
     {
         ChatMode mode = DiscordBot.ProcessChatMode(message);
         if (mode != ChatMode.None)
@@ -211,6 +209,10 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
 
     public static IEnumerable<string> FindSamples(string value)
     {
+
+        if (names.Count == 0)
+            DiscordBot.buildOption();
+
         ArgumentNullException.ThrowIfNull(value);
 
         return names
@@ -239,12 +241,15 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     }
 
     [SlashCommand("dm", "Send dm to a person.")]
-    public void TestDmsDynList([SlashCommandParameter(AutocompleteProviderType = typeof(SearchSamplesAutocompleteProvider))] string name, [SlashCommandParameter]string content)
+    public string TestDmsDynList([SlashCommandParameter(AutocompleteProviderType = typeof(SearchSamplesAutocompleteProvider))] string name, [SlashCommandParameter]string content)
     {
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatMode.Tell, $"{name} {content}"));
         }
+
+        return $"/tell {name} {content}";
+
     }
 
 }
