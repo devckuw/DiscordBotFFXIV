@@ -25,8 +25,6 @@ namespace DiscordBotFFXIV;
 
 public class DiscordBot : IDisposable
 {
-
-    public static IPluginLog Logger;
     private Plugin plugin;
     public static List<(ChatMode, string)> messages = new List<(ChatMode, string)>();
     public ApplicationCommandService<ApplicationCommandContext, AutocompleteInteractionContext> applicationCommandService;

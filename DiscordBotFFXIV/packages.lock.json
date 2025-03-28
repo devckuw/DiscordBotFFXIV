@@ -1,58 +1,64 @@
 {
   "version": 1,
   "dependencies": {
-    "net8.0-windows7.0": {
+    "net9.0-windows7.0": {
       "DalamudPackager": {
         "type": "Direct",
-        "requested": "[11.0.0, )",
-        "resolved": "11.0.0",
-        "contentHash": "bjT7XUlhIJSmsE/O76b7weUX+evvGQctbQB8aKXt94o+oPWxHpCepxAGMs7Thow3AzCyqWs7cOpp9/2wcgRRQA=="
+        "requested": "[12.0.0, )",
+        "resolved": "12.0.0",
+        "contentHash": "J5TJLV3f16T/E2H2P17ClWjtfEBPpq3yxvqW46eN36JCm6wR+EaoaYkqG9Rm5sHqs3/nK/vKjWWyvEs/jhKoXw=="
+      },
+      "DotNet.ReproducibleBuilds": {
+        "type": "Direct",
+        "requested": "[1.2.25, )",
+        "resolved": "1.2.25",
+        "contentHash": "xCXiw7BCxHJ8pF6wPepRUddlh2dlQlbr81gXA72hdk4FLHkKXas7EH/n+fk5UCA/YfMqG1Z6XaPiUjDbUNBUzg=="
       },
       "NetCord": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.349, )",
-        "resolved": "1.0.0-alpha.349",
-        "contentHash": "pPGKqFmc9jgoIv+Yy/ERsLVodnrHQaK+S+R1jo40EORaZoiEXLPzFYly3ajaeaqwPaEmzdtJpuILpqvm8gHq3w=="
+        "requested": "[1.0.0-alpha.355, )",
+        "resolved": "1.0.0-alpha.355",
+        "contentHash": "tlaRuoYj0RuYhSj0A1C8TnLY7/pPbaIbVi6A1hZlKU0nAYgczKp0hbBlYjLRVHm0CWve+5DMVhdxiWWH5Od+7A=="
       },
       "NetCord.Hosting": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.349, )",
-        "resolved": "1.0.0-alpha.349",
-        "contentHash": "7o59XcUkGUBxqQCt6FAy2O1lyI6VJb9lMk9oiQj01A5EUuUvTbSZITYcbwdgfAGB2Cmii18bcK+VUcxWDuqYHQ==",
+        "requested": "[1.0.0-alpha.355, )",
+        "resolved": "1.0.0-alpha.355",
+        "contentHash": "TPhd1H2kNtG2yw3A0kPPBK+yTFh0OaRJqmx1Ckp7cXX+GdjJV0AVLJqNi3skhgCCAFfzWcSCuCdEmCPXMAxfdA==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "8.0.2",
           "Microsoft.Extensions.Hosting.Abstractions": "8.0.1",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "8.0.0",
           "Microsoft.Extensions.Options.DataAnnotations": "8.0.0",
-          "NetCord": "1.0.0-alpha.349"
+          "NetCord": "1.0.0-alpha.355"
         }
       },
       "NetCord.Hosting.AspNetCore": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.349, )",
-        "resolved": "1.0.0-alpha.349",
-        "contentHash": "LOHV+P0ddeBGcr/QFuCemf4QuALpXD99u7lQEFvzDZHGuJV33q0OfaNFuhvx4DfYCz/SkO1FEM2k2vWB2fUKhg==",
+        "requested": "[1.0.0-alpha.355, )",
+        "resolved": "1.0.0-alpha.355",
+        "contentHash": "c5wBHApCtUzEProGjLc5RsPPZ9LTAe5bPRgPUNtRK9G4IUYX3KGCJR5olvgT92YqLisj8b4d1naoFuwZwxdAhg==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-alpha.349"
+          "NetCord.Hosting": "1.0.0-alpha.355"
         }
       },
       "NetCord.Hosting.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.349, )",
-        "resolved": "1.0.0-alpha.349",
-        "contentHash": "rbItnzgUcBWgDMKj7+jgjeBlpIhwbUGd5WNXURNugnFtqUuaMd2hH3Dgf95YLWTUDyCMU5rXJxCakoK3EsbMVw==",
+        "requested": "[1.0.0-alpha.355, )",
+        "resolved": "1.0.0-alpha.355",
+        "contentHash": "oWH1PKC9AaJHiLuDaxZVwJ3LPK1cbg0nypEKrQ+6E9IP09/cB6ySs8Ik1JnD4PM0HFDm50fLAR3bGGDEHGFL7g==",
         "dependencies": {
-          "NetCord.Hosting": "1.0.0-alpha.349",
-          "NetCord.Services": "1.0.0-alpha.349"
+          "NetCord.Hosting": "1.0.0-alpha.355",
+          "NetCord.Services": "1.0.0-alpha.355"
         }
       },
       "NetCord.Services": {
         "type": "Direct",
-        "requested": "[1.0.0-alpha.349, )",
-        "resolved": "1.0.0-alpha.349",
-        "contentHash": "+HKZIRIsYB9asRsk6wDPUBhyNiKVegzjoOvTg0Cw4xNZbpc+YFYEecry5yiDHzzUfpkuMEY1gy9qIxic/sWQnw==",
+        "requested": "[1.0.0-alpha.355, )",
+        "resolved": "1.0.0-alpha.355",
+        "contentHash": "g02wRbCLxwOpe/OUz2iEpcwzDRPNuHd4oWbU7bWsQrjXMasnFpdLzg1GDOZJrHCY4AEFplRAZGLUN2inU8inww==",
         "dependencies": {
-          "NetCord": "1.0.0-alpha.349"
+          "NetCord": "1.0.0-alpha.355"
         }
       },
       "Microsoft.Extensions.Configuration.Abstractions": {
