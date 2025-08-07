@@ -5,7 +5,7 @@ using System.Text;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
 using FFXIVClientStructs.FFXIV.Common.Lua;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DiscordBotFFXIV.Windows;
 

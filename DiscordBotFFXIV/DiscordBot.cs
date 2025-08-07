@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Plugin.Services;
 using DiscordBotFFXIV.Utils;
-using ImGuizmoNET;
+using Dalamud.Bindings.ImGuizmo;
 using Newtonsoft.Json;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using Lumina.Excel.Sheets;
@@ -81,7 +81,8 @@ public class DiscordBot : IDisposable
         }
         client.MessageCreate -= OnMessageCreated;
         client.InteractionCreate -= Client_InteractionCreate;
-        client.CloseAsync().Wait();
+        //client.CloseAsync().Wait();
+        client.CloseAsync();
         client.Dispose();
         Plugin.Logger.Debug("Unload Discord Bot");
     }
@@ -139,13 +140,13 @@ public class DiscordBot : IDisposable
     public async Task Start()
     {
         // Create the commands so that you can use them in the Discord client
-        await applicationCommandService.CreateCommandsAsync(client.Rest, client.Id);
+        await applicationCommandService.RegisterCommandsAsync(client.Rest, client.Id);
 
-        client.Log += message =>
+        /*client.Log += message =>
         {
             Console.WriteLine(message);
             return default;
-        };
+        };*/
 
         await client.StartAsync();
         //await Task.Delay(-1);
