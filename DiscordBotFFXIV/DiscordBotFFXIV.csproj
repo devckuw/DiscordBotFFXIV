@@ -22,8 +22,4 @@
     <PackageReference Include="NetCord.Hosting.Services" Version="1.0.0-alpha.410" />
     <PackageReference Include="NetCord.Services" Version="1.0.0-alpha.410" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="DalamudPackager" Version="14.0.0" />
-  </ItemGroup>
 </Project>
