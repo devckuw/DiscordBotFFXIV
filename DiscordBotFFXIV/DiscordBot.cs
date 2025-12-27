@@ -36,9 +36,19 @@ public class DiscordBot : IDisposable
         plugin = p;
         Plugin.Logger.Debug("BEFORE DiscordSocketClient");
 
-        if (!buildOption())
+        if (!buildFriendList())
         {
             Plugin.Logger.Debug("no friends sadge");
+        }
+
+        if (!buildLinkShellList())
+        {
+            Plugin.Logger.Debug("no linkshells sadge");
+        }
+
+        if (!buildCrossWorldLinkShellList())
+        {
+            Plugin.Logger.Debug("no crossworldlinkshells sadge");
         }
 
         client = new(new BotToken(plugin.Configuration.DiscordToken), new GatewayClientConfiguration()
@@ -85,6 +95,8 @@ public class DiscordBot : IDisposable
         client.CloseAsync();
         client.Dispose();
         Plugin.Logger.Debug("Unload Discord Bot");
+        ComModule.names = new List<string>();
+        ComModule.linkShells = new List<string>();
     }
 
     private ValueTask OnMessageCreated(Message message)
@@ -152,7 +164,7 @@ public class DiscordBot : IDisposable
         //await Task.Delay(-1);
     }
 
-    public static unsafe bool buildOption()
+    public static unsafe bool buildFriendList()
     {
 
         var agent = AgentFriendlist.Instance();
@@ -169,6 +181,77 @@ public class DiscordBot : IDisposable
         }
 
         return true;
+    }
+
+    public static unsafe bool buildLinkShellList()
+    {
+        ChatMode[] ls = { ChatMode.l1, ChatMode.l2, ChatMode.l3, ChatMode.l4, ChatMode.l5, ChatMode.l6, ChatMode.l7, ChatMode.l8 };
+        var array = FFXIVClientStructs.FFXIV.Component.GUI.AtkStage.Instance()->GetStringArrayData(FFXIVClientStructs.FFXIV.Component.GUI.StringArrayType.LinkShell);
+        if (array == null) return false;
+
+        for (int i = 0; i < 8; i++)
+        {
+            string name = array->ManagedStringArray[640 + i] == null ? string.Empty : array->ManagedStringArray[640 + i];
+            if (name != string.Empty)
+            {
+                //Plugin.Logger.Debug(name);
+                ComModule.linkShells.Add($"{ls[i]} {name}");
+            }
+        }
+        return true;
+    }
+
+    public static unsafe bool buildCrossWorldLinkShellList()
+    {
+        ChatMode[] cwls = { ChatMode.cwl1, ChatMode.cwl2, ChatMode.cwl3, ChatMode.cwl4, ChatMode.cwl5, ChatMode.cwl6, ChatMode.cwl7, ChatMode.cwl8 };
+        var infoProxy = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework.Instance()->GetUIModule()->GetInfoModule()->GetInfoProxyCrossWorldLinkshell(); ;
+        if (infoProxy == null) return false;
+
+        for (uint i = 0; i < 8; i++)
+        {
+            string name = infoProxy->GetCrossworldLinkshellName(i)->ToString();
+            if (name != string.Empty)
+            {
+                //Plugin.Logger.Debug(name);
+                ComModule.linkShells.Add($"{cwls[i]} {name}");
+            }
+        }
+        return true;
+    }
+
+    public static void resetFriendList()
+    {
+        ComModule.names = new List<string>();
+    }
+
+    public static void resetLinkShellList()
+    {
+        List<string> newLinkShells = new List<string>();
+        // > 41 => remove all l# values
+        foreach (var item in ComModule.linkShells)
+        {
+            if ((int)ChatHelper.GetChatMode(item.Split(" ")[0]) > 41)
+            {
+                newLinkShells.Add(item);
+            }
+        }
+
+        ComModule.linkShells = newLinkShells;
+    }
+    
+    public static void resetCrossWorldLinkShellList()
+    {
+        List<string> newLinkShells = new List<string>();
+        // < 41 => remove all cwl# values
+        foreach (var item in ComModule.linkShells)
+        {
+            if ((int)ChatHelper.GetChatMode(item.Split(" ")[0]) < 41)
+            {
+                newLinkShells.Add(item);
+            }
+        }
+
+        ComModule.linkShells = newLinkShells;
     }
 
     public static ChatMode ProcessChatMode(string message)
@@ -205,12 +288,14 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
 {
 
     public static List<string> names = new List<string>();
+    //public static Dictionary<ChatMode, string> linkShells = new Dictionary<ChatMode, string>();
+    public static List<string> linkShells = new List<string>();
 
-    public static IEnumerable<string> FindSamples(string value)
+    public static IEnumerable<string> FindSamplesFriends(string value)
     {
 
         if (names.Count == 0)
-            DiscordBot.buildOption();
+            DiscordBot.buildFriendList();
 
         ArgumentNullException.ThrowIfNull(value);
 
@@ -221,13 +306,13 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
             .ThenBy(n => n);
     }
 
-    public class SearchSamplesAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
+    public class FriendsAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
     {
         public ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(
             ApplicationCommandInteractionDataOption option,
             AutocompleteInteractionContext context)
         {
-            var sampleNames = FindSamples(option.Value!).Take(25);
+            var sampleNames = FindSamplesFriends(option.Value!).Take(25);
             Console.WriteLine(sampleNames);
             var choices = sampleNames.Select(name =>
             {
@@ -239,15 +324,108 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
         }
     }
 
-    [SlashCommand("dm", "Send dm to a person.")]
-    public string TestDmsDynList([SlashCommandParameter(AutocompleteProviderType = typeof(SearchSamplesAutocompleteProvider))] string name, [SlashCommandParameter]string content)
+    public static IEnumerable<string> FindSamplesLinkShells(string value)
+    {
+
+        if (linkShells.Count == 0)
+        {
+            DiscordBot.buildCrossWorldLinkShellList();
+            DiscordBot.buildLinkShellList();
+        }
+
+        ArgumentNullException.ThrowIfNull(value);
+
+        return linkShells
+            .Select(s => s)
+            .Where(n => n.Contains(value, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(n => n.IndexOf(value, StringComparison.OrdinalIgnoreCase))
+            .ThenBy(n => n);
+    }
+
+    public class LinkShellAutocompleteProvider : IAutocompleteProvider<AutocompleteInteractionContext>
+    {
+        public ValueTask<IEnumerable<ApplicationCommandOptionChoiceProperties>?> GetChoicesAsync(
+            ApplicationCommandInteractionDataOption option,
+            AutocompleteInteractionContext context)
+        {
+            //var sampleNames = FindSamplesLinkShells(option.Value!).Take(25);
+            var sampleNames = FindSamplesLinkShells(option.Value!);
+            Console.WriteLine(sampleNames);
+            var choices = sampleNames.Select(displayName =>
+            {
+                string mode = displayName.Split(" ")[0];
+                return new ApplicationCommandOptionChoiceProperties(displayName, mode);
+            });
+
+            return new(choices);
+        }
+    }
+
+    [SlashCommand("dm", "Sends dm to someone.")]
+    public string CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider))] string name, [SlashCommandParameter] string content)
     {
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatMode.Tell, $"{name} {content}"));
+            return $"/tell {name} {content}";
         }
 
-        return $"/tell {name} {content}";
+        return "No right for it.";
+
+    }
+
+    [SlashCommand("p", "Talk in party.")]
+    public string CommandPartyChat([SlashCommandParameter] string content)
+    {
+        if (Context.User.GlobalName == DiscordBot.userName)
+        {
+            DiscordBot.messages.Add((ChatMode.Party, content));
+            return $"/p {content}";
+        }
+        return "No right for it.";
+    }
+
+    [SlashCommand("fc", "Talk in free company.")]
+    public string CommandFreeCompanyChat([SlashCommandParameter] string content)
+    {
+        if (Context.User.GlobalName == DiscordBot.userName)
+        {
+            DiscordBot.messages.Add((ChatMode.FreeCompany, content));
+            return $"/fc {content}";
+        }
+        return "No right for it.";
+    }
+
+    [SlashCommand("l", "Talk in cwls/ls.")]
+    public string CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter] string content)
+    {
+        if (Context.User.GlobalName == DiscordBot.userName)
+        {
+            DiscordBot.messages.Add((ChatHelper.GetChatMode(ls), $"{content}"));
+            return $"/{ls} {content}";
+        }
+
+        return "No right for it.";
+
+    }
+
+    [SlashCommand("reload", "Reload friends and cwls/ls.")]
+    public string CommandReloadList()
+    {
+        if (Context.User.GlobalName == DiscordBot.userName)
+        {
+            DiscordBot.resetCrossWorldLinkShellList();
+            DiscordBot.resetLinkShellList();
+            DiscordBot.resetFriendList();
+
+            DiscordBot.buildCrossWorldLinkShellList();
+            DiscordBot.buildLinkShellList();
+            DiscordBot.buildFriendList();
+
+            return $"Reloaded";
+        }
+
+        return "No right for it.";
 
     }
 

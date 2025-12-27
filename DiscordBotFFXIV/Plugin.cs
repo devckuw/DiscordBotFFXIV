@@ -29,7 +29,7 @@ public sealed class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("DiscordBotFFXIV");
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
-    public DiscordBot discordBot { get; init; }
+    public DiscordBot? discordBot { get; set; }
 
     public Plugin()
     {
@@ -42,19 +42,16 @@ public sealed class Plugin : IDalamudPlugin
 
         ChatHelper.Initialize();
 
-        discordBot = new DiscordBot(this);
-        Task.Run(async () =>
-        {
-            await discordBot.Start();
-        });
         DiscordBot.userName = Configuration.discordUser;
+
+        StartDiscordBot();
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Open main interface."
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
@@ -67,10 +64,24 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
     }
 
+    public void StartDiscordBot()
+    {
+        if (Configuration.DiscordToken == null || Configuration.DiscordToken == string.Empty)
+        {
+            Plugin.Logger.Debug("Discord Token not set.");
+            return;
+        }
+        discordBot = new DiscordBot(this);
+        Task.Run(async () =>
+        {
+            await discordBot.Start();
+        });
+    }
+
     public void Dispose()
     {
         WindowSystem.RemoveAllWindows();
-        discordBot.Dispose();
+        discordBot?.Dispose();
         ChatHelper.Instance?.Dispose();
 
         ConfigWindow.Dispose();

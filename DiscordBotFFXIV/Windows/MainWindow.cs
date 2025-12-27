@@ -58,6 +58,9 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
+#if DEBUG
+        ImGui.Text($"friend:{ComModule.names.Count}, linkshell:{ComModule.linkShells.Count}");
+        #endif
         if (ImGui.Button("Show Settings"))
         {
             Plugin.ToggleConfigUI();
@@ -118,7 +121,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Turn on 'Message Content Intent' or the bot wont be able to read your mesages.");
         ImGui.Text("Dont forget to save modification.");
         ImGui.Text("Click 'Reset Token' to get your bot token and enter it bellow.");
-        ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 64);
+        ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 128);
         ImGui.SameLine();
         if (ImGui.Button("Save##savetoken"))
         {
@@ -146,11 +149,28 @@ public class MainWindow : Window, IDisposable
             Plugin.Configuration.discordUser = userName;
             userName = string.Empty;
             Plugin.Configuration.Save();
+            DiscordBot.userName = Plugin.Configuration.discordUser;
         }
         ImGui.SameLine();
         ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
 
         ImGui.NewLine();
         ImGui.Text("You are done! Restart the plugin and try.");
+
+        if (Plugin.discordBot == null)
+        {
+            if (ImGui.Button("Starts bot##startbotbutton"))
+            {
+                Plugin.StartDiscordBot();
+            }
+        }
+        else
+        {
+            if (ImGui.Button("Reload bot##reloadbotbutton"))
+            {
+                Plugin.discordBot.Dispose();
+                Plugin.StartDiscordBot();
+            }
+        }
     }
 }

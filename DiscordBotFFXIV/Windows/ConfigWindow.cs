@@ -59,6 +59,7 @@ public class ConfigWindow : Window, IDisposable
             Configuration.discordUser = userName;
             userName = string.Empty;
             Configuration.Save();
+            DiscordBot.userName = Configuration.discordUser;
         }
         ImGui.SameLine();
         ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
@@ -67,7 +68,7 @@ public class ConfigWindow : Window, IDisposable
             ImGui.Text(Configuration.discordUser);
         }
 
-        ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 64);
+        ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 128);
         ImGui.SameLine();
         if (ImGui.Button("Save##savetoken"))
         {

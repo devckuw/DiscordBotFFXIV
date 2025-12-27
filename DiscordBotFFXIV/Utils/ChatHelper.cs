@@ -187,6 +187,47 @@ namespace DiscordBotFFXIV.Utils
             Marshal.WriteInt64(mem + 0x18, 0);
             return mem;
         }
+
+        public static ChatMode GetChatMode(string s)
+        {
+            switch (s)
+            {
+                case "l1":
+                    return ChatMode.l1;
+                case "l2":
+                    return ChatMode.l2;
+                case "l3":
+                    return ChatMode.l3;
+                case "l4":
+                    return ChatMode.l4;
+                case "l5":
+                    return ChatMode.l5;
+                case "l6":
+                    return ChatMode.l6;
+                case "l7":
+                    return ChatMode.l7;
+                case "l8":
+                    return ChatMode.l8;
+                case "cwl1":
+                    return ChatMode.cwl1;
+                case "cwl2":
+                    return ChatMode.cwl2;
+                case "cwl3":
+                    return ChatMode.cwl3;
+                case "cwl4":
+                    return ChatMode.cwl4;
+                case "cwl5":
+                    return ChatMode.cwl5;
+                case "cwl6":
+                    return ChatMode.cwl6;
+                case "cwl7":
+                    return ChatMode.cwl7;
+                case "cwl8":
+                    return ChatMode.cwl8;
+                default:
+                    return ChatMode.None;
+            }
+        }
     }
 
     public delegate IntPtr UiModuleDelegate(IntPtr baseUiPtr);
