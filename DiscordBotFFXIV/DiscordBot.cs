@@ -364,6 +364,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("dm", "Sends dm to someone.")]
     public string CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider))] string name, [SlashCommandParameter] string content)
     {
+        Plugin.Logger.Debug($"sender: {Context.User.GlobalName} - allowed: {DiscordBot.userName}");
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatMode.Tell, $"{name} {content}"));
@@ -377,6 +378,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("p", "Talk in party.")]
     public string CommandPartyChat([SlashCommandParameter] string content)
     {
+        Plugin.Logger.Debug($"sender: {Context.User.GlobalName} - allowed: {DiscordBot.userName}");
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatMode.Party, content));
@@ -388,6 +390,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("fc", "Talk in free company.")]
     public string CommandFreeCompanyChat([SlashCommandParameter] string content)
     {
+        Plugin.Logger.Debug($"sender: {Context.User.GlobalName} - allowed: {DiscordBot.userName}");
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatMode.FreeCompany, content));
@@ -399,6 +402,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("l", "Talk in cwls/ls.")]
     public string CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter] string content)
     {
+        Plugin.Logger.Debug($"sender: {Context.User.GlobalName} - allowed: {DiscordBot.userName}");
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatHelper.GetChatMode(ls), $"{content}"));
@@ -412,6 +416,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("reload", "Reload friends and cwls/ls.")]
     public string CommandReloadList()
     {
+        Plugin.Logger.Debug($"sender: {Context.User.GlobalName} - allowed: {DiscordBot.userName}");
         if (Context.User.GlobalName == DiscordBot.userName)
         {
             DiscordBot.resetCrossWorldLinkShellList();
