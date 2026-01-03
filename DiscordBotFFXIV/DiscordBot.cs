@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Plugin.Services;
+using Dalamud.Game.Text;
+using Dalamud.Game.Text.SeStringHandling;
 using DiscordBotFFXIV.Utils;
 using Dalamud.Bindings.ImGuizmo;
 using Newtonsoft.Json;
@@ -30,6 +32,8 @@ public class DiscordBot : IDisposable
     public ApplicationCommandService<ApplicationCommandContext, AutocompleteInteractionContext> applicationCommandService;
     public GatewayClient client;
     public static string userName = "";
+    private Message? lastMessage;
+    private long lastMessageTime = 0;//= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     public DiscordBot(Plugin p)
     {
@@ -68,9 +72,9 @@ public class DiscordBot : IDisposable
 
         Plugin.Logger.Debug("AFTER DiscordSocketClient");
 
-        
-    }
+        Plugin.ChatGui.ChatMessage += OnInGameMessageReceived;
 
+    }
 
     ~DiscordBot()
     {
@@ -89,6 +93,7 @@ public class DiscordBot : IDisposable
         {
             return;
         }
+        Plugin.ChatGui.ChatMessage += OnInGameMessageReceived;
         client.MessageCreate -= OnMessageCreated;
         client.InteractionCreate -= Client_InteractionCreate;
         //client.CloseAsync().Wait();
@@ -98,11 +103,72 @@ public class DiscordBot : IDisposable
         ComModule.names = new List<string>();
         ComModule.linkShells = new List<string>();
     }
+    
+    public void OnInGameMessageReceived(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+    {
+        if (type != XivChatType.ErrorMessage) return;
+        Plugin.Logger.Debug($"{message.TextValue}");
+
+        bool needreturn = false;
+        if (lastMessage == null)
+        {
+            Plugin.Logger.Debug($"last msg null");
+            needreturn = true;
+        }
+        else
+        {
+            Plugin.Logger.Debug($"current msq held {lastMessage.Content}");
+        }
+
+        Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime}");
+
+        if ((DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime) > 1000)
+        {
+            //Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime}");
+            needreturn = true;
+        }
+
+        if (needreturn) return;
+        Plugin.Logger.Debug($"Error message in range");
+
+        string msg = message.TextValue;
+
+        if (lastMessage?.Type == MessageType.ApplicationCommand)
+        {
+            Action<MessageOptions> action = options =>
+            {
+                options.Content = msg;
+                options.Flags = MessageFlags.Ephemeral;
+            };
+            lastMessage?.ModifyAsync(action);
+        }
+        else
+        {
+            ReplyMessageProperties replyMsg = new ReplyMessageProperties();
+            replyMsg.Content = msg;
+
+            lastMessage?.ReplyAsync(replyMsg);
+        }        
+    }
 
     private ValueTask OnMessageCreated(Message message)
     {
+        //Plugin.Logger.Debug("msg");
+
+        if (/*message.Author.Username == plugin.Configuration.discordUser && */message.Type == MessageType.ApplicationCommand && message.Author.Id == client.Id)
+        {
+            lastMessage = message;
+            lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            Plugin.Logger.Debug($"command? {message.Author.Username}");
+        }
+        //message.
         if (message.Author.Username == plugin.Configuration.discordUser && !message.Author.IsBot)
         {
+            lastMessage = message;
+            lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            Plugin.Logger.Debug("direct msg");
+            
             AddMessageToQueue(message.Content);
         }
         return ValueTask.CompletedTask;
@@ -279,6 +345,11 @@ public class DiscordBot : IDisposable
         {
             message = DiscordBot.ProcessContent(message);
         }
+        if (message.Length > 440)
+        {
+            messages.Add((mode, message[..440]));
+            return;
+        }
         messages.Add((mode, message));
     }
 
@@ -362,7 +433,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     }
 
     [SlashCommand("dm", "Sends dm to someone.")]
-    public string CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider))] string name, [SlashCommandParameter] string content)
+    public string CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider), MaxLength = 31)] string name, [SlashCommandParameter(MaxLength = 440)] string content)
     {
         if (Context.User.Username == DiscordBot.userName)
         {
@@ -375,7 +446,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     }
 
     [SlashCommand("p", "Talk in party.")]
-    public string CommandPartyChat([SlashCommandParameter] string content)
+    public string CommandPartyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
         if (Context.User.Username == DiscordBot.userName)
         {
@@ -386,7 +457,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     }
 
     [SlashCommand("fc", "Talk in free company.")]
-    public string CommandFreeCompanyChat([SlashCommandParameter] string content)
+    public string CommandFreeCompanyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
         if (Context.User.Username == DiscordBot.userName)
         {
@@ -396,13 +467,43 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
         return "No right for it.";
     }
 
+    [SlashCommand("s", "Talk in say chat.")]
+    public string CommandSayChat([SlashCommandParameter] string content)
+    {
+        if (Context.User.Username == DiscordBot.userName)
+        {
+            DiscordBot.messages.Add((ChatMode.Say, content));
+            return $"/s {content}";
+        }
+        return "No right for it.";
+    }
+
     [SlashCommand("l", "Talk in cwls/ls.")]
-    public string CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter] string content)
+    public string CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter(MaxLength = 490)] string content)
     {
         if (Context.User.Username == DiscordBot.userName)
         {
             DiscordBot.messages.Add((ChatHelper.GetChatMode(ls), $"{content}"));
             return $"/{ls} {content}";
+        }
+
+        return "No right for it.";
+
+    }
+
+    [SlashCommand("help", "Shows help.")]
+    public string CommandHelp()
+    {
+        if (Context.User.Username == DiscordBot.userName)
+        {
+            return $"/help => display help\n" +
+            "/dm name:charname@world/autofill content:text => send a dm\n" +
+            "/p content:text => talk in party\n" +
+            "/fc content:text => talk in free company\n" +
+            "/l ls:autofill content:text => talk in ls/cwls\n" +
+            "/s content:text => talk in party\n" +
+            "/reload => reload friends/ls/cwls for autofill\n" +
+            "chatmode text => see the test module in the plugin";
         }
 
         return "No right for it.";

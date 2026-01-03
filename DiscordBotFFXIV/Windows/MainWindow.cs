@@ -60,7 +60,7 @@ public class MainWindow : Window, IDisposable
     {
 #if DEBUG
         ImGui.Text($"friend:{ComModule.names.Count}, linkshell:{ComModule.linkShells.Count}");
-        #endif
+#endif
         if (ImGui.Button("Show Settings"))
         {
             Plugin.ToggleConfigUI();
@@ -74,33 +74,6 @@ public class MainWindow : Window, IDisposable
         }
         ImGui.SameLine();
         ImGuiComponents.HelpMarker("Show debug in Echo channel.");
-        
-        if (Plugin.Configuration.DiscordToken  == string.Empty)
-        {
-            ImGui.Text("Enter your token in the config pannel then restart the plugin");
-        }
-        if (Plugin.Configuration.discordUser  == string.Empty)
-        {
-            ImGui.Text("Enter your discord name in pannel config or you wont get any msg");
-        }
-
-        ImGui.NewLine();
-        if (ImGui.InputTextWithHint("##inputTest", "Try input here, should work the same as on discord.", ref testMessage, 256, ImGuiInputTextFlags.EnterReturnsTrue))
-        {
-            DiscordBot.AddMessageToQueue(testMessage);
-            testMessage = string.Empty;
-        }
-        ImGui.SameLine();
-        if (ImGui.Button("Send##inputTestSend"))
-        {
-            DiscordBot.AddMessageToQueue(testMessage);
-            testMessage = string.Empty;
-        }
-        ImGui.Text("exemple : chat-mode msg");
-        ImGui.SameLine();
-        ImGuiComponents.HelpMarker("chat-mode :\nNone,\nEcho | e,\nTell | t,\nParty | p,\nAlliance | a,\nSay | s,\nEmote | em,\nShout | sh," +
-            "\nYell | y,\nFreeCompany | fc,\nLinkShell1-8 | l1-8,\n" +
-            "CrossLinkShell1-8 | cwl1-8");
 
         ImGui.NewLine();
         ImGui.Text("How to Setup :");
@@ -155,7 +128,8 @@ public class MainWindow : Window, IDisposable
         ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
 
         ImGui.NewLine();
-        ImGui.Text("You are done! Restart the plugin and try.");
+        ImGui.Text("You are done! Start the plugin and try.");
+        ImGui.Text("You might need to restart discord to see commands pop.");
 
         if (Plugin.discordBot == null)
         {
@@ -172,5 +146,26 @@ public class MainWindow : Window, IDisposable
                 Plugin.StartDiscordBot();
             }
         }
+
+        ImGui.NewLine();
+        ImGui.Text("You can now send message through discord by:");
+        ImGui.Text("- using command (/help /p /fc ..)");
+        ImGui.Text("- writing full text like the test tool bellow");
+        if (ImGui.InputTextWithHint("##inputTest", "Try input here, should work the same as on discord.", ref testMessage, 256, ImGuiInputTextFlags.EnterReturnsTrue))
+        {
+            DiscordBot.AddMessageToQueue(testMessage);
+            testMessage = string.Empty;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Send##inputTestSend"))
+        {
+            DiscordBot.AddMessageToQueue(testMessage);
+            testMessage = string.Empty;
+        }
+        ImGui.Text("exemple : chat-mode msg");
+        ImGui.SameLine();
+        ImGuiComponents.HelpMarker("chat-mode :\nNone,\nEcho | e,\nTell | t,\nParty | p,\nAlliance | a,\nSay | s,\nEmote | em,\nShout | sh," +
+            "\nYell | y,\nFreeCompany | fc,\nLinkShell1-8 | l1-8,\n" +
+            "CrossLinkShell1-8 | cwl1-8");
     }
 }
