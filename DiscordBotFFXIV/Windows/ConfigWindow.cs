@@ -12,14 +12,9 @@ namespace DiscordBotFFXIV.Windows;
 public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
-    /*private byte[] textInput = new byte[128];
-    private byte[] userName = new byte[128];*/
     private string token = string.Empty;
     private string userName = string.Empty;
 
-    // We give this window a constant ID using ###
-    // This allows for labels being dynamic, like "{FPS Counter}fps###XYZ counter window",
-    // and the window ID will always be "###XYZ counter window" for ImGui
     public ConfigWindow(Plugin plugin) : base("DiscordBotFFXIV Config###With a constant ID")
     {
         Flags = ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |

@@ -27,12 +27,12 @@ namespace DiscordBotFFXIV;
 
 public class DiscordBot : IDisposable
 {
-    private Plugin plugin;
+    public Plugin plugin;
     public static List<(ChatMode, string)> messages = new List<(ChatMode, string)>();
     public ApplicationCommandService<ApplicationCommandContext, AutocompleteInteractionContext> applicationCommandService;
     public GatewayClient client;
     public static string userName = "";
-    private Message? lastMessage;
+    public static RestMessage? lastMessage;
     private long lastMessageTime = 0;//= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
     public DiscordBot(Plugin p)
@@ -120,9 +120,11 @@ public class DiscordBot : IDisposable
             Plugin.Logger.Debug($"current msq held {lastMessage.Content}");
         }
 
-        Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime}");
+        //Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime}");
+        Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessage?.CreatedAt.ToUnixTimeMilliseconds()}");
 
-        if ((DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime) > 1000)
+        if ((DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessage?.CreatedAt.ToUnixTimeMilliseconds()) > 1000)
+        //if ((DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime) > 1000)
         {
             //Plugin.Logger.Debug($"{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - lastMessageTime}");
             needreturn = true;
@@ -155,11 +157,11 @@ public class DiscordBot : IDisposable
     {
         //Plugin.Logger.Debug("msg");
 
-        if (/*message.Author.Username == plugin.Configuration.discordUser && */message.Type == MessageType.ApplicationCommand && message.Author.Id == client.Id)
+        if (/*message.Author.Username != && */message.Type == MessageType.ApplicationCommand && message.Author.Id == client.Id)
         {
             lastMessage = message;
             lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            Plugin.Logger.Debug($"command? {message.Author.Username}");
+            Plugin.Logger.Debug($"command?: {message.Author.Username} {message.Content}");
         }
         //message.
         if (message.Author.Username == plugin.Configuration.discordUser && !message.Author.IsBot)
@@ -167,7 +169,7 @@ public class DiscordBot : IDisposable
             lastMessage = message;
             lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            Plugin.Logger.Debug("direct msg");
+            Plugin.Logger.Debug($"direct msg: {message.Author.Username} {message.Content}");
             
             AddMessageToQueue(message.Content);
         }
@@ -433,62 +435,88 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     }
 
     [SlashCommand("dm", "Sends dm to someone.")]
-    public string CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider), MaxLength = 31)] string name, [SlashCommandParameter(MaxLength = 440)] string content)
+    public void CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider), MaxLength = 31)] string name, [SlashCommandParameter(MaxLength = 440)] string content)
     {
+        Task<InteractionCallbackResponse?> response;
         if (Context.User.Username == DiscordBot.userName)
         {
+            response = RespondAsync(InteractionCallback.Message($"/tell {name} {content}"),true);
+            response.Wait();
+            DiscordBot.lastMessage = response?.Result?.Resource?.Message;
             DiscordBot.messages.Add((ChatMode.Tell, $"{name} {content}"));
-            return $"/tell {name} {content}";
+            return;
         }
-
-        return "No right for it.";
-
+        response = RespondAsync(InteractionCallback.Message("No right for it."),true);
+        response.Wait();
+        return;
     }
 
     [SlashCommand("p", "Talk in party.")]
-    public string CommandPartyChat([SlashCommandParameter(MaxLength = 490)] string content)
+    public void CommandPartyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
+        Task<InteractionCallbackResponse?> response;
         if (Context.User.Username == DiscordBot.userName)
         {
+            response = RespondAsync(InteractionCallback.Message($"/p {content}"),true);
+            response.Wait();
+            DiscordBot.lastMessage = response?.Result?.Resource?.Message;
             DiscordBot.messages.Add((ChatMode.Party, content));
-            return $"/p {content}";
+            return;
         }
-        return "No right for it.";
+        response = RespondAsync(InteractionCallback.Message("No right for it."),true);
+        response.Wait();
+        return;
     }
 
     [SlashCommand("fc", "Talk in free company.")]
-    public string CommandFreeCompanyChat([SlashCommandParameter(MaxLength = 490)] string content)
+    public void CommandFreeCompanyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
+        Task<InteractionCallbackResponse?> response;
         if (Context.User.Username == DiscordBot.userName)
         {
+            response = RespondAsync(InteractionCallback.Message($"/fc {content}"),true);
+            response.Wait();
+            DiscordBot.lastMessage = response?.Result?.Resource?.Message;
             DiscordBot.messages.Add((ChatMode.FreeCompany, content));
-            return $"/fc {content}";
+            return;
         }
-        return "No right for it.";
+        response = RespondAsync(InteractionCallback.Message("No right for it."),true);
+        response.Wait();
+        return;
     }
 
     [SlashCommand("s", "Talk in say chat.")]
-    public string CommandSayChat([SlashCommandParameter] string content)
+    public void CommandSayChat([SlashCommandParameter] string content)
     {
+        Task<InteractionCallbackResponse?> response;
         if (Context.User.Username == DiscordBot.userName)
         {
+            response = RespondAsync(InteractionCallback.Message($"/s {content}"),true);
+            response.Wait();
+            DiscordBot.lastMessage = response?.Result?.Resource?.Message;
             DiscordBot.messages.Add((ChatMode.Say, content));
-            return $"/s {content}";
+            return;
         }
-        return "No right for it.";
+        response = RespondAsync(InteractionCallback.Message("No right for it."),true);
+        response.Wait();
+        return;
     }
 
     [SlashCommand("l", "Talk in cwls/ls.")]
-    public string CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter(MaxLength = 490)] string content)
+    public void CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter(MaxLength = 490)] string content)
     {
+        Task<InteractionCallbackResponse?> response;
         if (Context.User.Username == DiscordBot.userName)
         {
+            response = RespondAsync(InteractionCallback.Message($"/{ls} {content}"),true);
+            response.Wait();
+            DiscordBot.lastMessage = response?.Result?.Resource?.Message;
             DiscordBot.messages.Add((ChatHelper.GetChatMode(ls), $"{content}"));
-            return $"/{ls} {content}";
+            return;
         }
-
-        return "No right for it.";
-
+        response = RespondAsync(InteractionCallback.Message("No right for it."),true);
+        response.Wait();
+        return;
     }
 
     [SlashCommand("help", "Shows help.")]
@@ -505,9 +533,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
             "/reload => reload friends/ls/cwls for autofill\n" +
             "chatmode text => see the test module in the plugin";
         }
-
         return "No right for it.";
-
     }
 
     [SlashCommand("reload", "Reload friends and cwls/ls.")]
@@ -525,9 +551,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
 
             return $"Reloaded";
         }
-
         return "No right for it.";
-
     }
 
 }

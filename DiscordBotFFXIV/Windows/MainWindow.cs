@@ -79,7 +79,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("How to Setup :");
         ImGui.Text("Go to discord and create a new application.");
         ImGui.SameLine();
-        if (ImGui.Button("Go##discordAPP"))
+        if (ImGui.Button("Open##discordAPP"))
         {
             Util.OpenLink("https://discord.com/developers/applications");
         }

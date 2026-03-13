@@ -6,7 +6,6 @@ Plugin to talk in FFXIV from Discord for Dalamud.
 
 * Add a discord bot to your server.
 * Talk on FFXIV from your discord server.
-* Will prolly add more feature later.
 
 
 
