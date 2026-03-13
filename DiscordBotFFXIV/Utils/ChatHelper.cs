@@ -4,6 +4,11 @@ using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using FFXIVClientStructs.FFXIV.Client.System.String;
+using FFXIVClientStructs.FFXIV.Client.UI.Shell;
 
 namespace DiscordBotFFXIV.Utils
 {
@@ -62,131 +67,45 @@ namespace DiscordBotFFXIV.Utils
         t = 50
     }
 
-    internal unsafe class ChatHelper : IDisposable
+
+    public static class ChatHelper
     {
-        #region Singleton
-        private ChatHelper()
-        {
-            if (Plugin.SigScanner.TryScanText("48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC ?? 48 8B F2 48 8B F9 45 84 C9", out IntPtr ptr))
-            {
-                _chatModulePtr = ptr;
-            }
-        }
-
-        public static void Initialize() { Instance = new ChatHelper(); }
-
-        public static ChatHelper Instance { get; private set; } = null!;
-
-        ~ChatHelper()
-        {
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected void Dispose(bool disposing)
-        {
-            if (!disposing)
-            {
-                return;
-            }
-
-            Instance = null!;
-        }
-        #endregion
-
-        private IntPtr _chatModulePtr;
-
-        public static unsafe bool IsInputTextActive()
-        {
-            Framework* framework = Framework.Instance();
-            if (framework == null) { return false; }
-
-            UIModule* module = framework->GetUIModule();
-            if (module == null) { return false; }
-
-            RaptureAtkModule* atkModule = module->GetRaptureAtkModule();
-            if (atkModule == null) { return false; }
-
-            return atkModule->AtkModule.IsTextInputActive();
-        }
-
         public static void Send(ChatMode mode, string msg)
         {
-            if (Instance == null)
-            {
-                return;
-            }
             if (mode == ChatMode.None)
             {
-                SendChatMessage("/e No Chat mode selected.");
+                ExecuteCommand("/e No Chat mode selected.");
                 return;
             }
             msg = "/" + mode.ToString().ToLower() + " " + msg;
-            SendChatMessage(msg);
+            ExecuteCommand(msg);
         }
 
-        public static void SendChatMessage(string message)
+        public static unsafe void ExecuteCommand(string command)
         {
-            if (Instance == null)
-            {
+            if (!command.StartsWith('/'))
                 return;
-            }
 
-            Instance.SendMessage(message);
+            using var cmd = new Utf8String(command);
+
+            // Technically not needed since we don't use payloads but provides a better example.
+            cmd.SanitizeString(
+                AllowedEntities.Unknown9     |
+                AllowedEntities.Payloads          |
+                AllowedEntities.OtherCharacters   |
+                AllowedEntities.SpecialCharacters |
+                AllowedEntities.Numbers           |
+                AllowedEntities.LowercaseLetters  |
+                AllowedEntities.UppercaseLetters  );
+
+            if (cmd.Length > 500)
+                return;
+
+            RaptureShellModule.Instance()->ExecuteCommandInner(&cmd, UIModule.Instance());
         }
 
-        private void SendMessage(string message)
-        {
-            if (message == null || message.Length == 0)
-            {
-                return;
-            }
+        public static unsafe bool IsInputTextActive => RaptureAtkModule.Instance()->IsTextInputActive();
 
-            // let dalamud process the command first
-            if (Plugin.CommandManager.ProcessCommand(message))
-            {
-                return;
-            }
-
-            if (_chatModulePtr == IntPtr.Zero)
-            {
-                return;
-            }
-
-            // encode message
-            var (text, length) = EncodeMessage(message);
-            var payload = MessagePayload(text, length);
-
-            ChatDelegate chatDelegate = Marshal.GetDelegateForFunctionPointer<ChatDelegate>(_chatModulePtr);
-            chatDelegate.Invoke(Plugin.GameGui.GetUIModule(), payload, IntPtr.Zero, (byte)0);
-
-            Marshal.FreeHGlobal(payload);
-            Marshal.FreeHGlobal(text);
-        }
-
-        private static (IntPtr, long) EncodeMessage(string message)
-        {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            var mem = Marshal.AllocHGlobal(bytes.Length + 30);
-            Marshal.Copy(bytes, 0, mem, bytes.Length);
-            Marshal.WriteByte(mem + bytes.Length, 0);
-            return (mem, bytes.Length + 1);
-        }
-
-        private static IntPtr MessagePayload(IntPtr message, long length)
-        {
-            var mem = Marshal.AllocHGlobal(400);
-            Marshal.WriteInt64(mem, message.ToInt64());
-            Marshal.WriteInt64(mem + 0x8, 64);
-            Marshal.WriteInt64(mem + 0x10, length);
-            Marshal.WriteInt64(mem + 0x18, 0);
-            return mem;
-        }
 
         public static ChatMode GetChatMode(string s)
         {
@@ -229,7 +148,4 @@ namespace DiscordBotFFXIV.Utils
             }
         }
     }
-
-    public delegate IntPtr UiModuleDelegate(IntPtr baseUiPtr);
-    public delegate IntPtr ChatDelegate(IntPtr uiModulePtr, IntPtr message, IntPtr unknown1, byte unknown2);
 }

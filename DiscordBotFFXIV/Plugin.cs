@@ -39,8 +39,6 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
 
-        ChatHelper.Initialize();
-
         DiscordBot.userName = Configuration.discordUser;
 
         StartDiscordBot();
@@ -76,7 +74,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         WindowSystem.RemoveAllWindows();
         discordBot?.Dispose();
-        ChatHelper.Instance?.Dispose();
 
         ConfigWindow.Dispose();
         MainWindow.Dispose();
