@@ -60,7 +60,7 @@ public class ConfigWindow : Window, IDisposable
             DiscordBot.userID = Configuration.userID;
         }
         ImGui.SameLine();
-        ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
+        ImGuiComponents.HelpMarker("Enter discord user ID of the person allowed to use that bot");
         if (Configuration.showValues)
         {
             ImGui.Text($"{Configuration.userID}");

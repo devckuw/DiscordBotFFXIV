@@ -114,7 +114,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Select the server where you want to add the bot.");
 
         ImGui.NewLine();
-        ImGui.Text("Enter your discord username ID bellow.");
+        ImGui.Text("Enter your discord ID bellow.");
         ImGui.InputULong("##userID", ref userID);
         //ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userID, 64);
         ImGui.SameLine();
