@@ -13,7 +13,7 @@ public class ConfigWindow : Window, IDisposable
 {
     private Configuration Configuration;
     private string token = string.Empty;
-    private string userName = string.Empty;
+    private ulong userNameInput = 0;
 
     public ConfigWindow(Plugin plugin) : base("DiscordBotFFXIV Config###With a constant ID")
     {
@@ -47,20 +47,23 @@ public class ConfigWindow : Window, IDisposable
             Configuration.showValues = showValue;
             Configuration.Save();
         }
-        ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userName, 64);
+
+        ImGui.InputULong("##userID", ref userNameInput);
+        //ImGui.input
+        //ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userName, 64);
         ImGui.SameLine();
         if (ImGui.Button("Save##saveusername"))
         {
-            Configuration.discordUser = userName;
-            userName = string.Empty;
+            Configuration.userID = userNameInput;
+            userNameInput = 0;
             Configuration.Save();
-            DiscordBot.userName = Configuration.discordUser;
+            DiscordBot.userID = Configuration.userID;
         }
         ImGui.SameLine();
         ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
         if (Configuration.showValues)
         {
-            ImGui.Text(Configuration.discordUser);
+            ImGui.Text($"{Configuration.userID}");
         }
 
         ImGui.InputTextWithHint("##token", "Enter Discord Token Here", ref token, 128);

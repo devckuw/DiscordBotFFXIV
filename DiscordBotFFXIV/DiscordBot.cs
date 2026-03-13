@@ -31,7 +31,7 @@ public class DiscordBot : IDisposable
     public static List<(ChatMode, string)> messages = new List<(ChatMode, string)>();
     public ApplicationCommandService<ApplicationCommandContext, AutocompleteInteractionContext> applicationCommandService;
     public GatewayClient client;
-    public static string userName = "";
+    public static ulong userID = 0;
     public static RestMessage? lastMessage;
     private long lastMessageTime = 0;//= DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -155,7 +155,6 @@ public class DiscordBot : IDisposable
 
     private ValueTask OnMessageCreated(Message message)
     {
-        //Plugin.Logger.Debug("msg");
 
         if (/*message.Author.Username != && */message.Type == MessageType.ApplicationCommand && message.Author.Id == client.Id)
         {
@@ -163,8 +162,7 @@ public class DiscordBot : IDisposable
             lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             Plugin.Logger.Debug($"command?: {message.Author.Username} {message.Content}");
         }
-        //message.
-        if (message.Author.Username == plugin.Configuration.discordUser && !message.Author.IsBot)
+        if (message.Author.Id == DiscordBot.userID && !message.Author.IsBot)
         {
             lastMessage = message;
             lastMessageTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -438,7 +436,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public void CommandDirectMessage([SlashCommandParameter(AutocompleteProviderType = typeof(FriendsAutocompleteProvider), MaxLength = 31)] string name, [SlashCommandParameter(MaxLength = 440)] string content)
     {
         Task<InteractionCallbackResponse?> response;
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             response = RespondAsync(InteractionCallback.Message($"/tell {name} {content}"),true);
             response.Wait();
@@ -455,7 +453,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public void CommandPartyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
         Task<InteractionCallbackResponse?> response;
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             response = RespondAsync(InteractionCallback.Message($"/p {content}"),true);
             response.Wait();
@@ -472,7 +470,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public void CommandFreeCompanyChat([SlashCommandParameter(MaxLength = 490)] string content)
     {
         Task<InteractionCallbackResponse?> response;
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             response = RespondAsync(InteractionCallback.Message($"/fc {content}"),true);
             response.Wait();
@@ -489,7 +487,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public void CommandSayChat([SlashCommandParameter] string content)
     {
         Task<InteractionCallbackResponse?> response;
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             response = RespondAsync(InteractionCallback.Message($"/s {content}"),true);
             response.Wait();
@@ -506,7 +504,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public void CommandLinkShellMessage([SlashCommandParameter(AutocompleteProviderType = typeof(LinkShellAutocompleteProvider))] string ls, [SlashCommandParameter(MaxLength = 490)] string content)
     {
         Task<InteractionCallbackResponse?> response;
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             response = RespondAsync(InteractionCallback.Message($"/{ls} {content}"),true);
             response.Wait();
@@ -522,7 +520,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("help", "Shows help.")]
     public string CommandHelp()
     {
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             return $"/help => display help\n" +
             "/dm name:charname@world/autofill content:text => send a dm\n" +
@@ -539,7 +537,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     [SlashCommand("reload", "Reload friends and cwls/ls.")]
     public string CommandReloadList()
     {
-        if (Context.User.Username == DiscordBot.userName)
+        if (Context.User.Id == DiscordBot.userID)
         {
             DiscordBot.resetCrossWorldLinkShellList();
             DiscordBot.resetLinkShellList();

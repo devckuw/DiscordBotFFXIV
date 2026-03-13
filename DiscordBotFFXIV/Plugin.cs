@@ -39,7 +39,7 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
 
-        DiscordBot.userName = Configuration.discordUser;
+        DiscordBot.userID = Configuration.userID;
 
         StartDiscordBot();
 

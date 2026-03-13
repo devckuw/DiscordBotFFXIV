@@ -11,13 +11,12 @@ public class Configuration : IPluginConfiguration
 
     public bool showDebug { get; set; } = false;
     public bool showValues { get; set; } = false;
-    public string discordUser { get; set; } = String.Empty;
+    public ulong userID { get; set; } = 0;
     public string DiscordToken { get; set; } = String.Empty;
 
     // the below exist just to make saving less cumbersome
     public void Save()
     {
-        DiscordBot.userName = discordUser;
         Plugin.PluginInterface.SavePluginConfig(this);
     }
 }

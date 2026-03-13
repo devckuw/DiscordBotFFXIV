@@ -19,7 +19,7 @@ public class MainWindow : Window, IDisposable
     private Plugin Plugin;
     private string testMessage = string.Empty;
     private string token = string.Empty;
-    private string userName = string.Empty;
+    private ulong userID = 0;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
@@ -114,15 +114,16 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Select the server where you want to add the bot.");
 
         ImGui.NewLine();
-        ImGui.Text("Enter your discord username bellow.");
-        ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userName, 64);
+        ImGui.Text("Enter your discord username ID bellow.");
+        ImGui.InputULong("##userID", ref userID);
+        //ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userID, 64);
         ImGui.SameLine();
         if (ImGui.Button("Save##saveusername"))
         {
-            Plugin.Configuration.discordUser = userName;
-            userName = string.Empty;
+            Plugin.Configuration.userID = userID;
+            userID = 0;
             Plugin.Configuration.Save();
-            DiscordBot.userName = Plugin.Configuration.discordUser;
+            DiscordBot.userID = Plugin.Configuration.userID;
         }
         ImGui.SameLine();
         ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
