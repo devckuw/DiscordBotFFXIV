@@ -361,6 +361,7 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
     public static List<string> names = new List<string>();
     //public static Dictionary<ChatMode, string> linkShells = new Dictionary<ChatMode, string>();
     public static List<string> linkShells = new List<string>();
+    public static bool autoCompleteFriends = false;
 
     public static IEnumerable<string> FindSamplesFriends(string value)
     {
@@ -383,7 +384,16 @@ public class ComModule : ApplicationCommandModule<ApplicationCommandContext>
             ApplicationCommandInteractionDataOption option,
             AutocompleteInteractionContext context)
         {
-            var sampleNames = FindSamplesFriends(option.Value!).Take(25);
+            IEnumerable<string> sampleNames;
+            if (autoCompleteFriends)
+            {
+                sampleNames = FindSamplesFriends(option.Value!).Take(25);
+            }
+            else
+            {
+                sampleNames = FindSamplesFriends(option.Value!).Take(0);
+            }
+            //var sampleNames = FindSamplesFriends(option.Value!).Take(25);
             Console.WriteLine(sampleNames);
             var choices = sampleNames.Select(name =>
             {

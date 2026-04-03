@@ -101,7 +101,8 @@ namespace DiscordBotFFXIV.Utils
             if (cmd.Length > 500)
                 return;
 
-            RaptureShellModule.Instance()->ExecuteCommandInner(&cmd, UIModule.Instance());
+            UIModule.Instance()->ProcessChatBoxEntry(&cmd);
+            //RaptureShellModule.Instance()->ExecuteCommandInner(&cmd, UIModule.Instance());
         }
 
         public static unsafe bool IsInputTextActive => RaptureAtkModule.Instance()->IsTextInputActive();

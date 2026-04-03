@@ -29,7 +29,7 @@ public class MainWindow : Window, IDisposable
     {
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(375, 330),
+            MinimumSize = new Vector2(500, 850),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
@@ -147,6 +147,16 @@ public class MainWindow : Window, IDisposable
                 Plugin.StartDiscordBot();
             }
         }
+
+        var autoCompleteFriends = Plugin.Configuration.AutoCompleteFriends;
+        if (ImGui.Checkbox("Auto complete Friends in /dm (Check info)", ref autoCompleteFriends))
+        {
+            Plugin.Configuration.AutoCompleteFriends = autoCompleteFriends;
+            Plugin.Configuration.Save();
+            ComModule.autoCompleteFriends = autoCompleteFriends;
+        }
+        ImGui.SameLine();
+        ImGuiComponents.HelpMarker("Anyone on the server will be able to see people\nin your friend list by typing /dm.\nI recommend to use this bot on 'solo private'\nserver for a safer experience!");
 
         ImGui.NewLine();
         ImGui.Text("You can now send message through discord by:");

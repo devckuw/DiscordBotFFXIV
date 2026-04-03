@@ -40,6 +40,7 @@ public sealed class Plugin : IDalamudPlugin
         MainWindow = new MainWindow(this);
 
         DiscordBot.userID = Configuration.userID;
+        ComModule.autoCompleteFriends = Configuration.AutoCompleteFriends;
 
         StartDiscordBot();
 

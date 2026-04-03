@@ -22,7 +22,7 @@ public class ConfigWindow : Window, IDisposable
 
         SizeConstraints = new WindowSizeConstraints
         {
-            MinimumSize = new Vector2(232, 90),
+            MinimumSize = new Vector2(530, 220),
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
@@ -80,5 +80,14 @@ public class ConfigWindow : Window, IDisposable
         {
             ImGui.Text(Configuration.DiscordToken);
         }
+        var autoCompleteFriends = Configuration.AutoCompleteFriends;
+        if (ImGui.Checkbox("Auto complete Friends in /dm (Check info)", ref autoCompleteFriends))
+        {
+            Configuration.AutoCompleteFriends = autoCompleteFriends;
+            Configuration.Save();
+            ComModule.autoCompleteFriends = autoCompleteFriends;
+        }
+        ImGui.SameLine();
+        ImGuiComponents.HelpMarker("Anyone on the server will be able to see people\nin your friend list by typing /dm.\nI recommend to use this bot on 'solo private'\nserver for a safer experience!");
     }
 }

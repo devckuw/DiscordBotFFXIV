@@ -13,6 +13,7 @@ public class Configuration : IPluginConfiguration
     public bool showValues { get; set; } = false;
     public ulong userID { get; set; } = 0;
     public string DiscordToken { get; set; } = String.Empty;
+    public bool AutoCompleteFriends { get; set; } = false;
 
     // the below exist just to make saving less cumbersome
     public void Save()
