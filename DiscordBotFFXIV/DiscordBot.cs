@@ -21,6 +21,8 @@ using NetCord.Rest;
 using NetCord.Services.ApplicationCommands;
 using NetCord.Gateway;
 using static Dalamud.Interface.Utility.Raii.ImRaii;
+using Dalamud.Game.Chat;
+using Dalamud.Utility;
 //using Discord.Interactions.Builders;
 
 namespace DiscordBotFFXIV;
@@ -73,7 +75,7 @@ public class DiscordBot : IDisposable
         Plugin.Logger.Debug("AFTER DiscordSocketClient");
 
         Plugin.ChatGui.ChatMessage += OnInGameMessageReceived;
-
+        //OnMessageDelegate(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled);
     }
 
     ~DiscordBot()
@@ -93,7 +95,7 @@ public class DiscordBot : IDisposable
         {
             return;
         }
-        Plugin.ChatGui.ChatMessage += OnInGameMessageReceived;
+        Plugin.ChatGui.ChatMessage -= OnInGameMessageReceived;
         client.MessageCreate -= OnMessageCreated;
         client.InteractionCreate -= Client_InteractionCreate;
         //client.CloseAsync().Wait();
@@ -103,11 +105,12 @@ public class DiscordBot : IDisposable
         ComModule.names = new List<string>();
         ComModule.linkShells = new List<string>();
     }
-    
-    public void OnInGameMessageReceived(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
+
+    public void OnInGameMessageReceived(IChatMessage chatMessage)
+    //public void OnInGameMessageReceived(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (type != XivChatType.ErrorMessage) return;
-        Plugin.Logger.Debug($"{message.TextValue}");
+        if (chatMessage.LogKind != XivChatType.ErrorMessage) return;
+        Plugin.Logger.Debug($"{chatMessage.Message.TextValue}");
 
         bool needreturn = false;
         if (lastMessage == null)
@@ -133,7 +136,7 @@ public class DiscordBot : IDisposable
         if (needreturn) return;
         Plugin.Logger.Debug($"Error message in range");
 
-        string msg = message.TextValue;
+        string msg = chatMessage.Message.TextValue;
 
         if (lastMessage?.Type == MessageType.ApplicationCommand)
         {
@@ -257,7 +260,8 @@ public class DiscordBot : IDisposable
 
         for (int i = 0; i < 8; i++)
         {
-            string name = array->ManagedStringArray[640 + i] == null ? string.Empty : array->ManagedStringArray[640 + i];
+            string name = !array->ManagedStringArray[640 + i].HasValue ? string.Empty : array->ManagedStringArray[640 + i].ExtractText();
+            //string name = array->ManagedStringArray[640 + i].ExtractText();
             if (name != string.Empty)
             {
                 //Plugin.Logger.Debug(name);
