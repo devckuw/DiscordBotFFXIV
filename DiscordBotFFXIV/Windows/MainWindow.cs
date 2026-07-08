@@ -114,7 +114,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Select the server where you want to add the bot.");
 
         ImGui.NewLine();
-        ImGui.Text("Enter your discord ID bellow.");
+        ImGui.Text("Enter your discord User ID bellow.\nWith 'Copy User ID' (see github for screenshot)");
         ImGui.InputULong("##userID", ref userID);
         //ImGui.InputTextWithHint("##username", "Enter Discord User Name Here", ref userID, 64);
         ImGui.SameLine();
@@ -126,7 +126,7 @@ public class MainWindow : Window, IDisposable
             DiscordBot.userID = Plugin.Configuration.userID;
         }
         ImGui.SameLine();
-        ImGuiComponents.HelpMarker("Enter discord user name of the person allowed to use that bot");
+        ImGuiComponents.HelpMarker("Enter discord user ID of the person allowed to use that bot");
 
         ImGui.NewLine();
         ImGui.Text("You are done! Start the plugin and try.");
