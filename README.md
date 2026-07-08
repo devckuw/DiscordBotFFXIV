@@ -11,6 +11,7 @@ Plugin to talk in FFXIV from Discord for Dalamud.
 
 ## How To Use
 
-### Getting Started
+### Copy User ID
 
-Add https://raw.githubusercontent.com/devckuw/DistribPluginFFXIV/main/repo.json to your custom repo in Dalamud settings
+<img width="310" height="507" alt="image" src="https://github.com/user-attachments/assets/ff9e8960-78a9-4eec-b918-4430de5ee13d" />
+
